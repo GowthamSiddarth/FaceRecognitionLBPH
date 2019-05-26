@@ -17,8 +17,6 @@ def get_images_and_labels(dataset_path, face_detector):
         for x, y, w, h in faces:
             images.append(image[y: y + h, x: x + w])
             labels.append(label)
-            cv2.imshow("Adding face to training set", image[y: y + h, x: x + w])
-            cv2.waitKey(50)
 
     return images, labels
 
@@ -28,3 +26,6 @@ face_detector = cv2.CascadeClassifier(cascade_path)
 
 dataset_path = 'yalefaces'
 images, labels = get_images_and_labels(dataset_path, face_detector)
+
+face_recognizer = cv2.face_LBPHFaceRecognizer.create()
+face_recognizer.train(images, np.array(labels))
