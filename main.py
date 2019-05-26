@@ -29,3 +29,19 @@ images, labels = get_images_and_labels(dataset_path, face_detector)
 
 face_recognizer = cv2.face_LBPHFaceRecognizer.create()
 face_recognizer.train(images, np.array(labels))
+
+test_images_paths = [os.path.join(dataset_path, f) for f in os.listdir(dataset_path) if f.endswith(".sad")]
+correct_predictions = 0
+for test_image_path in test_images_paths:
+    test_image = np.array(Image.open(test_image_path).convert('L'), 'uint8')
+    faces = face_detector.detectMultiScale(test_image)
+    for x, y, w, h in faces:
+        label_predicted, conf = face_recognizer.predict(test_image[y: y + h, x: x + w])
+        label_actual = int(os.path.split(test_image_path)[1].split(".")[0].replace("subject", ""))
+        if label_actual == label_predicted:
+            correct_predictions += 1
+            print("{} Recognized correctly with confidence {}".format(label_actual, conf))
+        else:
+            print("{} Recognized incorrectly as {}".format(label_actual, label_predicted))
+
+print("Accuracy: {}".format(100 * correct_predictions / len(test_images_paths)))
